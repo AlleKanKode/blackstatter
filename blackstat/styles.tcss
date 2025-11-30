@@ -1,0 +1,54 @@
+Screen {
+    layout: vertical;
+}
+
+ProductListView {
+    height: 1fr;
+}
+
+DataTable {
+    height: 1fr;
+    border: solid green;
+}
+
+#dialog {
+    grid-size: 2;
+    grid-gutter: 1 2;
+    grid-rows: auto;
+    padding: 0 1;
+    width: 60;
+    height: auto;
+    border: thick $background 80%;
+    background: $surface;
+}
+
+Label {
+    column-span: 2;
+}
+
+Input {
+    column-span: 2;
+}
+
+Button {
+    width: 100%;
+}
+
+#product_label {
+    padding: 1;
+    background: $accent;
+    color: $text;
+    width: 100%;
+    text-align: center;
+}
+
+#price_graph {
+    height: 50%;
+    border: solid blue;
+}
+
+#price_table {
+    height: 50%;
+    border: solid green;
+}
+

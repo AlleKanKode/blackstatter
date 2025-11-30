@@ -1,0 +1,19 @@
+[project]
+name = "blackstatter"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "duckdb>=1.4.2",
+    "plotext>=5.3.2",
+    "pydantic>=2.12.5",
+    "python-dotenv>=1.2.1",
+    "textual>=6.7.0",
+    "textual-plotext>=1.0.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.1",
+]
