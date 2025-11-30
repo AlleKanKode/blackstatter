@@ -24,14 +24,17 @@ class ProductForm(ModalScreen[Product]):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "save":
-            name = self.query_one("#name", Input).value
-            url = self.query_one("#url", Input).value
-            
-            if self.product:
-                self.product.name = name
-                self.product.url = url
-                self.dismiss(self.product)
-            else:
-                self.dismiss(Product(name=name, url=url))
+            try:
+                name = self.query_one("#name", Input).value
+                url = self.query_one("#url", Input).value
+                
+                if self.product:
+                    self.product.name = name
+                    self.product.url = url
+                    self.dismiss(self.product)
+                else:
+                    self.dismiss(Product(name=name, url=url))
+            except Exception as e:
+                self.notify(f"Error saving product: {e}", severity="error")
         elif event.button.id == "cancel":
             self.dismiss(None)

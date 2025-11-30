@@ -59,8 +59,12 @@ class ProductListView(Static):
         if product:
             def handle_edit(updated_product: Product | None) -> None:
                 if updated_product:
-                    update_product(updated_product)
-                    self.refresh_products()
+                    try:
+                        update_product(updated_product)
+                        self.refresh_products()
+                        self.notify("Product updated")
+                    except Exception as e:
+                        self.notify(f"Error updating product: {e}", severity="error")
             
             self.app.push_screen(ProductForm(product), handle_edit)
 
