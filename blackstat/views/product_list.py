@@ -49,11 +49,12 @@ class ProductListView(Static):
 
     def action_edit_product(self) -> None:
         table = self.query_one(DataTable)
-        if not table.cursor_row_key:
+        if table.cursor_coordinate.row < 0:
             self.notify("No product selected", severity="warning")
             return
             
-        product_id = int(table.cursor_row_key.value)
+        row_key = table.coordinate_to_cell_key(table.cursor_coordinate).row_key
+        product_id = int(row_key.value)
         product = get_product(product_id)
         
         if product:
@@ -70,11 +71,12 @@ class ProductListView(Static):
 
     def action_delete_product(self) -> None:
         table = self.query_one(DataTable)
-        if not table.cursor_row_key:
+        if table.cursor_coordinate.row < 0:
             self.notify("No product selected", severity="warning")
             return
 
-        product_id = int(table.cursor_row_key.value)
+        row_key = table.coordinate_to_cell_key(table.cursor_coordinate).row_key
+        product_id = int(row_key.value)
         delete_product(product_id)
         self.refresh_products()
         self.notify("Product deleted")

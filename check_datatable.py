@@ -29,7 +29,13 @@ class TestApp(App):
                 f.write(f"Ordered rows failed: {e}\n")
 
             try:
-                f.write(f"Coordinate to cell key: {table.coordinate_to_cell_key(table.cursor_coordinate)}\n")
+                cell_key = table.coordinate_to_cell_key(table.cursor_coordinate)
+                row_key = cell_key.row_key
+                f.write(f"Row Key: {row_key}\n")
+                f.write(f"Row Key Type: {type(row_key)}\n")
+                f.write(f"Row Key Dir: {dir(row_key)}\n")
+                if hasattr(row_key, "value"):
+                    f.write(f"Row Key Value: {row_key.value}\n")
             except Exception as e:
                 f.write(f"Coordinate to cell key failed: {e}\n")
 

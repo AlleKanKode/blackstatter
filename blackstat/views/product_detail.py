@@ -76,38 +76,36 @@ class ProductDetailView(Screen):
 
     def action_edit_price(self) -> None:
         table = self.query_one("#price_table", DataTable)
-        if not table.cursor_row_key:
+        if table.cursor_coordinate.row < 0:
             self.notify("No price selected", severity="warning")
             return
             
-        # We need to find the transaction object. 
-        # Since we only have the ID in the key, we'll fetch all and find it, or fetch by ID.
-        # But our CRUD has get_prices_for_product. 
-        # Let's just fetch all and filter, or add a get_price_transaction to CRUD.
-        # For now, I'll iterate the current list in memory if I had it, but I don't store it.
-        # I'll rely on the table key which is the ID.
+        row_key = table.coordinate_to_cell_key(table.cursor_coordinate).row_key
+        transaction_id = int(row_key.value)
         
-        transaction_id = int(table.cursor_row_key.value)
-        # I need a get_price_transaction function in CRUD.
-        # I'll add it to CRUD later. For now, I'll hack it by fetching all.
         prices = get_prices_for_product(self.product.id)
         transaction = next((p for p in prices if p.id == transaction_id), None)
         
         if transaction:
             def handle_edit(updated_transaction: PriceTransaction | None) -> None:
                 if updated_transaction:
-                    update_price_transaction(updated_transaction)
-                    self.refresh_data()
+                    try:
+                        update_price_transaction(updated_transaction)
+                        self.refresh_data()
+                        self.notify("Price updated")
+                    except Exception as e:
+                        self.notify(f"Error updating price: {e}", severity="error")
             
             self.app.push_screen(PriceForm(self.product.id, transaction), handle_edit)
 
     def action_delete_price(self) -> None:
         table = self.query_one("#price_table", DataTable)
-        if not table.cursor_row_key:
+        if table.cursor_coordinate.row < 0:
             self.notify("No price selected", severity="warning")
             return
 
-        transaction_id = int(table.cursor_row_key.value)
+        row_key = table.coordinate_to_cell_key(table.cursor_coordinate).row_key
+        transaction_id = int(row_key.value)
         delete_price_transaction(transaction_id)
         self.refresh_data()
         self.notify("Price deleted")
