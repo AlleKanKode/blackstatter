@@ -16,6 +16,8 @@ class ProductDetailView(Screen):
         Binding("a", "add_price", "Add Price"),
         Binding("e", "edit_price", "Edit Price"),
         Binding("d", "delete_price", "Delete Price"),
+        Binding("u", "copy_url", "Copy URL"),
+        Binding("n", "copy_name", "Copy Name"),
     ]
 
     def __init__(self, product: Product):
@@ -110,3 +112,11 @@ class ProductDetailView(Screen):
         delete_price_transaction(transaction_id)
         self.refresh_data()
         self.notify("Price deleted")
+
+    def action_copy_url(self) -> None:
+        self.app.copy_to_clipboard(self.product.url)
+        self.notify(f"Copied URL: {self.product.url}")
+
+    def action_copy_name(self) -> None:
+        self.app.copy_to_clipboard(self.product.name)
+        self.notify(f"Copied Name: {self.product.name}")
