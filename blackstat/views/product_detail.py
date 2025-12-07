@@ -60,6 +60,7 @@ class ProductDetailView(Screen):
             sorted_prices = sorted(prices, key=lambda p: p.date)
             dates = [p.date.strftime("%Y-%m-%d %H:%M") for p in sorted_prices]
             values = [p.price for p in sorted_prices]
+            plt.date_form("Y-m-d H:M")
             plt.plot(dates, values)
             plt.xlabel("Date")
             plt.ylabel("Price")
