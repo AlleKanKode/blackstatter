@@ -7,6 +7,8 @@ from textual_plotext import PlotextPlot
 from blackstat.models.models import Product, PriceTransaction
 from blackstat.models.crud import get_prices_for_product, create_price_transaction, update_price_transaction, delete_price_transaction
 from blackstat.views.price_form import PriceForm
+from blackstat.agent import find_product_price
+import asyncio
 
 class ProductDetailView(Screen):
     """Screen to view product details, graph, and price history."""
@@ -18,6 +20,7 @@ class ProductDetailView(Screen):
         Binding("d", "delete_price", "Delete Price"),
         Binding("u", "copy_url", "Copy URL"),
         Binding("n", "copy_name", "Copy Name"),
+        Binding("c", "check_price", "Check Price (AI)"),
     ]
 
     def __init__(self, product: Product):
@@ -121,3 +124,24 @@ class ProductDetailView(Screen):
     def action_copy_name(self) -> None:
         self.app.copy_to_clipboard(self.product.name)
         self.notify(f"Copied Name: {self.product.name}")
+
+    async def action_check_price(self) -> None:
+        self.notify("Searching for price... this may take a moment.")
+        
+        # Run the agent in a worker to avoid blocking the UI too much
+        # Although find_product_price is async, the agent might do blocking calls internally or we just want to be safe
+        result = await find_product_price(self.product.name)
+        
+        if result:
+            self.notify(f"Found price: {result.price} {result.currency}")
+            
+            # Create new transaction
+            transaction = PriceTransaction(
+                product_id=self.product.id,
+                price=result.price,
+                source_url=result.source_url
+            )
+            create_price_transaction(transaction)
+            self.refresh_data()
+        else:
+            self.notify("Could not find a price.", severity="error")
