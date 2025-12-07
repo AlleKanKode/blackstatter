@@ -6,8 +6,12 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "duckdb>=1.4.2",
+    "duckduckgo-search>=8.1.1",
+    "google-generativeai>=0.8.5",
+    "nest-asyncio>=1.6.0",
     "plotext>=5.3.2",
     "pydantic>=2.12.5",
+    "pydantic-ai>=1.27.0",
     "python-dotenv>=1.2.1",
     "textual>=6.7.0",
     "textual-plotext>=1.0.1",
