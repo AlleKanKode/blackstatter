@@ -64,6 +64,7 @@ class ProductDetailView(Screen):
             values = [p.price for p in sorted_prices]
             plt.date_form("Y-m-d H:M")
             plt.plot(dates, values)
+            plt.ylim(0, max(values) * 1.1)
             plt.xlabel("Date")
             plt.ylabel("Price")
         
