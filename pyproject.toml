@@ -13,6 +13,7 @@ dependencies = [
     "pydantic>=2.12.5",
     "pydantic-ai>=1.27.0",
     "python-dotenv>=1.2.1",
+    "tavily-python>=0.7.14",
     "textual>=6.7.0",
     "textual-plotext>=1.0.1",
 ]
