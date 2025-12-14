@@ -76,12 +76,43 @@ def product_page(product_id: int):
             refresh_view()
             ui.notify("Price deleted")
 
+        async def add_price_dialog():
+            with ui.dialog() as dialog, ui.card():
+                ui.label('Add Price').classes('text-xl font-bold')
+                price_input = ui.number('Price').classes('w-full')
+                url_input = ui.input('Source URL').classes('w-full')
+                
+                def save():
+                    if not price_input.value:
+                        ui.notify('Please enter a price', color='warning')
+                        return
+                    
+                    try:
+                        price_val = float(price_input.value)
+                        create_price_transaction(PriceTransaction(
+                            product_id=product.id,
+                            price=price_val,
+                            source_url=url_input.value or "Manual Entry"
+                        ))
+                        ui.notify('Price added', color='positive')
+                        dialog.close()
+                        refresh_view()
+                    except ValueError:
+                        ui.notify('Invalid price', color='negative')
+
+                with ui.row().classes('justify-end w-full mt-4'):
+                    ui.button('Cancel', on_click=dialog.close).props('flat')
+                    ui.button('Save', on_click=save)
+            
+            dialog.open()
+
         # UI Structure
         with ui.row().classes('items-center gap-4 mb-4'):
             ui.link('Back', '/').classes('text-grey no-underline hover:text-white')
             ui.label(product.name).classes('text-3xl font-bold')
             spinner = ui.spinner(size='lg').classes('ml-auto')
             spinner.set_visibility(False)
+            ui.button('Add Price', icon='add', on_click=add_price_dialog).props('unelevated color=secondary')
             ui.button('Check Price', icon='smart_toy', on_click=check_price_ai).props('color=accent')
 
         ui.link(product.url, product.url, new_tab=True).classes('text-secondary mb-6 block')
