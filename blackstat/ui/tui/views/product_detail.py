@@ -2,14 +2,14 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Header, Footer, DataTable, Label
 from textual.binding import Binding
-from textual.containers import Vertical
+
 from textual_plotext import PlotextPlot
 from blackstat.models.product import Product
 from blackstat.models.price_transaction import PriceTransaction
 from blackstat.models.crud import get_prices_for_product, create_price_transaction, update_price_transaction, delete_price_transaction
 from blackstat.ui.tui.views.price_form import PriceForm
 from blackstat.controllers.price_agent import find_product_price
-import asyncio
+
 
 class ProductDetailView(Screen):
     """Screen to view product details, graph, and price history."""

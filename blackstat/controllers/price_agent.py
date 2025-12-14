@@ -1,8 +1,6 @@
 import os
 import nest_asyncio
 from typing import Optional
-from datetime import datetime
-from pydantic import BaseModel, Field
 from pydantic_ai import Agent, RunContext
 from ddgs import DDGS
 from dotenv import load_dotenv

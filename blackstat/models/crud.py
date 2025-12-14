@@ -1,5 +1,4 @@
 from typing import List, Optional
-from datetime import datetime
 from .db import get_connection
 from .product import Product
 from .price_transaction import PriceTransaction

@@ -1,7 +1,6 @@
 from textual.app import ComposeResult
 from textual.widgets import Static, DataTable
 from textual.binding import Binding
-from textual import on
 from blackstat.models.crud import get_all_products, create_product, update_product, delete_product, get_product
 from blackstat.ui.tui.views.product_form import ProductForm
 from blackstat.ui.tui.views.product_detail import ProductDetailView
