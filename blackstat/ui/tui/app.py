@@ -1,4 +1,7 @@
 from textual.app import App, ComposeResult
+import nest_asyncio
+# Apply nest_asyncio to allow nested event loops for Textual + Async Agent
+nest_asyncio.apply()
 from textual.widgets import Header, Footer
 from textual.binding import Binding
 from .views.product_list import ProductListView

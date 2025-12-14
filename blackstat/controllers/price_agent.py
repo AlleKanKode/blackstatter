@@ -1,13 +1,10 @@
 import os
-import nest_asyncio
 from typing import Optional
 from pydantic_ai import Agent, RunContext
 from ddgs import DDGS
 from dotenv import load_dotenv
 from blackstat.models.price_result import PriceResult
 
-# Allow nested event loops for Textual + Async Agent
-nest_asyncio.apply()
 
 load_dotenv()
 
