@@ -1,6 +1,7 @@
 import pytest
 from datetime import datetime
-from blackstat.models.models import Product, PriceTransaction
+from blackstat.models.product import Product
+from blackstat.models.price_transaction import PriceTransaction
 from blackstat.models.crud import create_product, get_all_products, create_price_transaction, get_prices_for_product, delete_product
 from blackstat.models.db import init_db, get_connection
 

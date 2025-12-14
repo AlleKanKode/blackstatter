@@ -2,7 +2,7 @@ from textual.app import ComposeResult
 from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Label
 from textual.containers import Grid
-from blackstat.models.models import Product
+from blackstat.models.product import Product
 
 class ProductForm(ModalScreen[Product]):
     """A screen to add or edit a product."""

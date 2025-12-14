@@ -1,7 +1,8 @@
 from typing import List, Optional
 from datetime import datetime
 from .db import get_connection
-from .models import Product, PriceTransaction
+from .product import Product
+from .price_transaction import PriceTransaction
 
 # Product CRUD
 

@@ -3,9 +3,9 @@ from textual.widgets import Static, DataTable
 from textual.binding import Binding
 from textual import on
 from blackstat.models.crud import get_all_products, create_product, update_product, delete_product, get_product
-from blackstat.views.product_form import ProductForm
-from blackstat.views.product_detail import ProductDetailView
-from blackstat.models.models import Product
+from blackstat.ui.tui.views.product_form import ProductForm
+from blackstat.ui.tui.views.product_detail import ProductDetailView
+from blackstat.models.product import Product
 
 class ProductListView(Static):
     """A widget to display a list of products."""

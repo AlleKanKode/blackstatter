@@ -4,8 +4,9 @@ from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, RunContext
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 from dotenv import load_dotenv
+from blackstat.models.price_result import PriceResult
 
 # Allow nested event loops for Textual + Async Agent
 nest_asyncio.apply()
@@ -26,11 +27,7 @@ try:
 except ImportError:
     HAS_TAVILY = False
 
-class PriceResult(BaseModel):
-    price: float = Field(..., description="The found price of the product")
-    currency: str = Field(..., description="The currency of the price (e.g. DKK, USD)")
-    source_url: str = Field(..., description="The URL where the price was found")
-    product_name: str = Field(..., description="The name of the product found")
+
 
 # Initialize the agent
 # Using gemini-2.5-flash as it is available in the list

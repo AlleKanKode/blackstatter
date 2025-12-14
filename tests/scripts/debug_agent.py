@@ -35,7 +35,7 @@ async def run_debug():
     # 3. Import Agent (Import here to ensure env vars are set first)
     try:
         print_debug("Importing agent...")
-        from blackstat.agent import find_product_price, agent
+        from blackstat.controllers.price_agent import find_product_price, agent
         print_debug("Agent imported successfully.")
     except Exception as e:
         print_debug(f"ERROR importing agent: {e}")
@@ -44,7 +44,7 @@ async def run_debug():
     # 4. Test Search Tool directly (optional, but good for debugging)
     print_debug("Testing Search Tool directly...")
     try:
-        from duckduckgo_search import DDGS
+        from ddgs import DDGS
         with DDGS() as ddgs:
             results = list(ddgs.text("test search", max_results=1))
             print_debug(f"Search tool check: {'Success' if results else 'Empty results'}")

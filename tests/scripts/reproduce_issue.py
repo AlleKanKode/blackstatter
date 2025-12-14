@@ -1,4 +1,4 @@
-from blackstat.models.models import Product
+from blackstat.models.product import Product
 from blackstat.models.crud import create_product, update_product, get_product, delete_product
 from blackstat.models.db import init_db
 

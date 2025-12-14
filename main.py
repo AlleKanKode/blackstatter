@@ -1,4 +1,4 @@
-from blackstat.tui import BlackStatterApp
+from blackstat.ui.tui.app import BlackStatterApp
 from blackstat.models.db import init_db
 from blackstat.utils.config import apply_locale
 

@@ -1,9 +1,0 @@
-Cursor Row Index: 1
-Ordered Rows Type: <class 'list'>
-Row 0: Row(key=<textual.widgets._data_table.RowKey object at 0x7faef4885810>, height=1, label=None, auto_height=False)
-Row 0 type: <class 'textual.widgets._data_table.Row'>
-Key at index 1: Row(key=<textual.widgets._data_table.RowKey object at 0x7faef4885950>, height=1, label=None, auto_height=False)
-Row Key: <textual.widgets._data_table.RowKey object at 0x7faef4885950>
-Row Key Type: <class 'textual.widgets._data_table.RowKey'>
-Row Key Dir: ['__annotations__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__firstlineno__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__rich_repr__', '__setattr__', '__sizeof__', '__static_attributes__', '__str__', '__subclasshook__', '__weakref__', 'value']
-Row Key Value: k2

@@ -3,7 +3,7 @@ from textual.app import ComposeResult
 from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Label
 from textual.containers import Grid
-from blackstat.models.models import PriceTransaction
+from blackstat.models.price_transaction import PriceTransaction
 
 class PriceForm(ModalScreen[PriceTransaction]):
     """A screen to add or edit a price transaction."""
