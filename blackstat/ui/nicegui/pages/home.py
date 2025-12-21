@@ -11,7 +11,10 @@ def home_page():
     # til den enkelte klient (browser tab). Det sikrer at brugere ikke deler state ved en fejl.
 
     # 'with layout():' er en context manager. I NiceGUI bruges 'with' flittigt til at bygge
-    # hierarkiet af elementer (dom træet). Alt indlejret her vises inden i layout rammen.
+    # hierarkiet af elementer (dom træet). 
+    # Funktionen 'layout' fungerer som en "master template". Den sætter header, footer, 
+    # styling (theme) og navigation op. Alt indlejret i denne blok vises i 'main content' 
+    # området mellem header og footer (der hvor 'yield' kaldes i layout.py).
     with layout():
         # Helper to refresh the list
         # Helper funktion defineret som "closure" inde i page-funktionen.
