@@ -1,4 +1,5 @@
 from nicegui import ui
+from typing import Optional
 from blackstat.ui.nicegui.layout import layout
 from blackstat.models.crud import get_all_products, create_product, delete_product
 from blackstat.models.product import Product
@@ -20,7 +21,32 @@ def home_page():
         # Helper funktion defineret som "closure" inde i page-funktionen.
         # På den måde har den adgang til lokale variabler som 'products_container'
         # og kan opdatere UI'et for netop denne bruger session.
+        
+        # Grid reference for later access
+        grid: Optional[ui.aggrid] = None
+        
+        async def navigate_to_product(e):
+            # Only navigate if clicking the name column, not when using checkbox
+            if e.args['colId'] == 'name' and e.args['data']:
+                ui.open(f'/product/{e.args["data"]["id"]}')
+
+        async def delete_selected():
+            nonlocal grid
+            if not grid: return
+            
+            rows = await grid.get_selected_rows()
+            if not rows:
+                ui.notify("No rows selected", color="warning")
+                return
+
+            for row in rows:
+                delete_product(row['id'])
+            
+            ui.notify(f"Deleted {len(rows)} products")
+            refresh_grid()
+
         def refresh_grid():
+            nonlocal grid
             # Opdaterings-mønster: Tøm containeren og genopbyg indholdet.
             products_container.clear()
             
@@ -32,19 +58,29 @@ def home_page():
                     ui.label("No products found.").classes("text-grey italic")
                     return
                 
-                with ui.grid(columns=3).classes('w-full gap-4'):
-                    for p in products:
-                        with ui.card().classes('w-full hover:shadow-lg transition-shadow'):
-                            with ui.row().classes('justify-between items-center w-full'):
-                                ui.link(p.name, f'/product/{p.id}').classes('text-lg font-bold text-primary no-underline')
-                                ui.button(icon='delete', color='negative', on_click=lambda id=p.id: delete_and_refresh(id)).props('flat')
-                            
-                            ui.link(p.url, p.url, new_tab=True).classes('text-sm text-grey truncate w-full block mb-2')
-                            
-        def delete_and_refresh(product_id):
-            delete_product(product_id)
-            ui.notify(f'Product {product_id} deleted', color='info')
-            refresh_grid()
+                # Definér kolonner til AG Grid
+                column_defs = [
+                    {'headerName': 'ID', 'field': 'id', 'checkboxSelection': True, 'width': 80},
+                    {'headerName': 'Name', 'field': 'name', 'filter': True, 'sortable': True, 'resizable': True},
+                    {'headerName': 'URL', 'field': 'url', 'sortable': True, 'resizable': True},
+                ]
+
+                # Konverter produkter til liste af dicts for AG Grid
+                # Note: Vi bruger html=True for at kunne rendere links hvis nødvendigt, 
+                # men her holder vi det simpelt med ren tekst og row events.
+                row_data = [
+                    {'id': p.id, 'name': p.name, 'url': p.url} for p in products
+                ]
+
+                with ui.row().classes('w-full justify-end mb-2'):
+                     ui.button('Delete Selected', on_click=delete_selected, icon='delete').props('outline color=negative')
+
+                grid = ui.aggrid({
+                    'columnDefs': column_defs,
+                    'rowData': row_data,
+                    'rowSelection': 'multiple',
+                    'class': 'ag-theme-balham-dark' # Use dark theme to match layout
+                }).classes('w-full h-96').on('cellClicked', navigate_to_product)
 
         # Asynkron funktion til dialoger. NiceGUI understøtter både sync og async handlers.
         async def add_product_dialog():
