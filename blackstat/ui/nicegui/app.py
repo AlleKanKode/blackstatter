@@ -11,4 +11,4 @@ def init_nicegui():
 
 def run_gui():
     init_nicegui()
-    ui.run(title='BlackStatter', dark=True, reload=False) # Reload=False for production/stable run
+    ui.run(title='BlackStatter', dark=True, reload=True) # Reload=True for development
