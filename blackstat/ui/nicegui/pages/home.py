@@ -1,4 +1,4 @@
-from nicegui import ui
+from nicegui import ui, events
 from typing import Optional
 from blackstat.ui.nicegui.layout import layout
 from blackstat.models.crud import get_all_products, create_product, delete_product
@@ -25,10 +25,22 @@ def home_page():
         # Grid reference for later access
         grid: Optional[ui.aggrid] = None
         
-        async def navigate_to_product(e):
+        async def navigate_to_product(e: events.GenericEventArguments):
             # Only navigate if clicking the name column, not when using checkbox
             if e.args['colId'] == 'name' and e.args['data']:
-                ui.open(f'/product/{e.args["data"]["id"]}')
+                ui.navigate.to(f'/product/{e.args["data"]["id"]}')
+
+        async def navigate_on_enter(e: events.GenericEventArguments):
+             try:
+                 # Check for key in nested structure (requested via args)
+                 key = e.args.get('event', {}).get('key')
+                 
+                 if key == 'Enter':
+                     if e.args.get('data'):
+                         ui.navigate.to(f'/product/{e.args["data"]["id"]}')
+             except Exception as ex:
+                 print(f"Error in navigate_on_enter: {ex}")
+                 print(f"Args: {e.args}")
 
         async def delete_selected():
             nonlocal grid
@@ -80,7 +92,7 @@ def home_page():
                     'rowData': row_data,
                     'rowSelection': 'multiple',
                     'class': 'ag-theme-balham-dark' # Use dark theme to match layout
-                }).classes('w-full h-96').on('cellClicked', navigate_to_product)
+                }).classes('w-full h-96').on('cellClicked', navigate_to_product).on('cellKeyDown', navigate_on_enter, args=['data', 'event.key', 'colId'])
 
         # Asynkron funktion til dialoger. NiceGUI understøtter både sync og async handlers.
         async def add_product_dialog():
