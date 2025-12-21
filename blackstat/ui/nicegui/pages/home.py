@@ -34,8 +34,12 @@ def home_page():
              try:
                  # Check for key in nested structure (requested via args)
                  key = e.args.get('event', {}).get('key')
+                 col_id = e.args.get('colId')
                  
-                 if key == 'Enter':
+                 print(f"DEBUG: Key='{key}', ColId='{col_id}', Args={e.args}") # DEBUG PRINT
+                 
+                 # Only navigate on Enter if in the 'name' column
+                 if key == 'Enter' and col_id == 'name':
                      if e.args.get('data'):
                          ui.navigate.to(f'/product/{e.args["data"]["id"]}')
              except Exception as ex:
@@ -92,7 +96,7 @@ def home_page():
                     'rowData': row_data,
                     'rowSelection': 'multiple',
                     'class': 'ag-theme-balham-dark' # Use dark theme to match layout
-                }).classes('w-full h-96').on('cellClicked', navigate_to_product).on('cellKeyDown', navigate_on_enter, args=['data', 'event.key', 'colId'])
+                }).classes('w-full h-96').on('cellDoubleClicked', navigate_to_product).on('cellKeyDown', navigate_on_enter, args=['data', 'colId', 'event', 'event.key'])
 
         # Asynkron funktion til dialoger. NiceGUI understøtter både sync og async handlers.
         async def add_product_dialog():
