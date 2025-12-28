@@ -8,6 +8,7 @@ from blackstat.models.product import Product
 from blackstat.models.price_transaction import PriceTransaction
 from blackstat.models.crud import get_prices_for_product, create_price_transaction, update_price_transaction, delete_price_transaction
 from blackstat.ui.tui.views.price_form import PriceForm
+from blackstat.ui.tui.views.loading_screen import LoadingScreen
 from blackstat.controllers.price_agent import find_product_price
 
 
@@ -127,11 +128,16 @@ class ProductDetailView(Screen):
         self.notify(f"Copied Name: {self.product.name}")
 
     async def action_check_price(self) -> None:
-        self.notify("Searching for price... this may take a moment.")
+        # Show loading screen
+        loading_screen = LoadingScreen("Agent searching for price...\nThis may take up to 30 seconds.")
+        self.app.push_screen(loading_screen)
         
-        # Run the agent in a worker to avoid blocking the UI too much
-        # Although find_product_price is async, the agent might do blocking calls internally or we just want to be safe
-        result = await find_product_price(self.product.name)
+        try:
+            # Run the agent
+            result = await find_product_price(self.product.name)
+        finally:
+            # removing screen
+            self.app.pop_screen()
         
         if result:
             self.notify(f"Found price: {result.price} {result.currency}")
@@ -145,4 +151,4 @@ class ProductDetailView(Screen):
             create_price_transaction(transaction)
             self.refresh_data()
         else:
-            self.notify("Could not find a price.", severity="error")
+            self.notify("Could not find a price. Try adding manually.", severity="error")
