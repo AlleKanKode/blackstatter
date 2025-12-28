@@ -85,7 +85,7 @@ async def find_product_price(product_name: str) -> Optional[PriceResult]:
             return None
 
         result = await agent.run(f"Find the current price for: {product_name}. Return the price in DKK if possible, otherwise convert or state original.")
-        return result.data
+        return result.output
     except Exception as e:
         print(f"Error running agent: {e}")
         return None
