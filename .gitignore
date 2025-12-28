@@ -12,3 +12,6 @@ wheels/
 
 # Database
 *.duckdb
+
+# Logs
+*.log
