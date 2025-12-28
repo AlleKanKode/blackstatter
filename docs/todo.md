@@ -3,3 +3,4 @@
 - GUI kører en-us fordi det ikke er sat i kaldet til ui.run()
 - Live reload i NiceGUI
 - Pristjek skal fungere med api (aka kreditkort)
+- Priser returneres ikke i DKK men i fundet valuta. Der skal tages hensyn til locale. 
