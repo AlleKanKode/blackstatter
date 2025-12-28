@@ -4,28 +4,37 @@ from pydantic_ai import Agent, RunContext
 from ddgs import DDGS
 from dotenv import load_dotenv
 from blackstat.models.price_result import PriceResult
+from blackstat.utils.logger import setup_logger
 
+# Setup logging to file (logs/price_agent.log) and console
+logger = setup_logger()
 
+# Load environment variables from .env file
 load_dotenv()
 
-# Ensure GOOGLE_API_KEY is set for pydantic-ai
+# --- Configuration & API Keys ---
+
+# Ensure GOOGLE_API_KEY is available for the Gemini agent.
+# If only GEMINI_API_KEY is set, copy it to GOOGLE_API_KEY.
 if not os.getenv("GOOGLE_API_KEY") and os.getenv("GEMINI_API_KEY"):
     os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY")
 
 if not os.getenv("GOOGLE_API_KEY"):
-    print("Warning: GOOGLE_API_KEY not found. Agent features will not work.")
+    logger.warning("GOOGLE_API_KEY not found. Agent features will not work.")
 
-# Try to import Tavily
+# Try to import Tavily client (preferred search tool)
+# We handle the ImportError so the app works even if 'tavily-python' is missing.
 try:
     from tavily import TavilyClient
     HAS_TAVILY = True
 except ImportError:
     HAS_TAVILY = False
 
+# --- Agent Initialization ---
 
-
-# Initialize the agent
-# Using gemini-2.5-flash as it is available in the list
+# Initialize the PydanticAI agent.
+# We use 'google-gla:gemini-2.5-flash' because it's fast and cost-effective.
+# The 'output_type=PriceResult' ensures the agent returns a structured object, not just text.
 agent = Agent(
     'google-gla:gemini-2.5-flash',
     output_type=PriceResult,
@@ -39,59 +48,88 @@ agent = Agent(
     ),
 )
 
+# --- Tools ---
+
 @agent.tool
 def search_web(ctx: RunContext, query: str) -> str:
-    """Search the web for the given query. Uses Tavily if API key is present, otherwise falls back to DuckDuckGo."""
-    print(f"Searching for: {query}")
+    """
+    Search the web for the given query.
     
-    # 1. Try Tavily
+    Strategy:
+    1. Try Tavily Search API (High quality, meant for LLMs) if key is present.
+    2. Fallback to DuckDuckGo (Free, but sometimes timed out/blocked) if Tavily fails or is missing.
+    """
+    logger.info(f"Searching for: {query}")
+    
+    # 1. Try Tavily (Preferred)
     tavily_key = os.getenv("TAVILY_API_KEY")
     if HAS_TAVILY and tavily_key:
         try:
             client = TavilyClient(api_key=tavily_key)
-            # Use 'q' parameter for Tavily and optimize for shopping/news if possible, but standard search is fine.
-            logger_print(f"Using Tavily for search: {query}")
+            logger.info(f"Using <green>Tavily</green> for search: {query}")
+            
+            # search_depth="basic" is faster and usually sufficient for specific product prices
             results = client.search(query, search_depth="basic", max_results=5)
-            # Tavily returns a dict with 'results' key
+            
+            # Log raw results for debugging purposes
+            logger.debug(f"Tavily Results: {results}")
+            
+            # Tavily returns a dict with a "results" list
             return str(results.get("results", []))
         except Exception as e:
-            print(f"Tavily search failed: {e}. Falling back to DuckDuckGo.")
+            logger.error(f"Tavily search failed: {e}. Falling back to DuckDuckGo.")
     
     # 2. Fallback to DuckDuckGo
     try:
-        logger_print(f"Using DuckDuckGo for search: {query}")
+        logger.info(f"Using <yellow>DuckDuckGo</yellow> for search: {query}")
         with DDGS() as ddgs:
-            # backend="html" is often more permissive than "api"
+            # We first try the 'html' backend as it is often more permissive/robust than the API backend
             results = list(ddgs.text(query, max_results=5, backend="html"))
+            
             if not results:
-                 # Try default backend if html returns nothing (rare but possible)
+                 logger.debug("DuckDuckGo HTML backend empty, trying default backend.")
                  results = list(ddgs.text(query, max_results=5))
+            
+            logger.debug(f"DuckDuckGo Results: {results}")
             return str(results)
     except Exception as e:
+        logger.error(f"DuckDuckGo search failed: {e}")
         return f"Search failed: {e}"
 
-def logger_print(msg):
-    # Simple helper to print with timestamp or debug prefix if needed
-    print(f"[Agent Tool] {msg}")
+# --- Main Logic ---
 
 async def find_product_price(product_name: str) -> Optional[PriceResult]:
     """
     Finds the price for a product using the AI agent.
+    
+    Returns:
+        PriceResult: Object containing price, currency, url if found.
+        None: If search fails, API key is missing, or invalid data is returned.
     """
     try:
-        # Check for API Key
         if not os.getenv("GEMINI_API_KEY"):
-            print("Error: GEMINI_API_KEY not found in environment variables.")
+            logger.error("GEMINI_API_KEY not found.")
             return None
 
-        result = await agent.run(f"Find the current price for: {product_name}. Return the price in DKK if possible, otherwise convert or state original.")
+        logger.info(f"Starting price check for: {product_name}")
         
+        # Run the agent with a prompt constructed from the product name
+        result = await agent.run(
+            f"Find the current price for: {product_name}. "
+            f"Return the price in DKK if possible, otherwise convert or state original."
+        )
+        
+        # The result object has an .output property because we defined output_type=PriceResult
         data = result.output
+        
+        # Validation: Filter out bad results like negative prices or missing URLs
         if data.price <= 0 or not data.source_url or data.source_url.lower() in ["n/a", "none"]:
-            print(f"Agent returned invalid data: {data}")
+            logger.warning(f"Agent returned invalid data: {data}")
             return None
             
+        logger.info(f"Price found: {data.price} {data.currency} at {data.source_url}")
         return data
+        
     except Exception as e:
-        print(f"Error running agent: {e}")
+        logger.exception(f"Error running agent: {e}")
         return None
