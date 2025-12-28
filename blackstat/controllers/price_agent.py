@@ -85,7 +85,13 @@ async def find_product_price(product_name: str) -> Optional[PriceResult]:
             return None
 
         result = await agent.run(f"Find the current price for: {product_name}. Return the price in DKK if possible, otherwise convert or state original.")
-        return result.output
+        
+        data = result.output
+        if data.price <= 0 or not data.source_url or data.source_url.lower() in ["n/a", "none"]:
+            print(f"Agent returned invalid data: {data}")
+            return None
+            
+        return data
     except Exception as e:
         print(f"Error running agent: {e}")
         return None
